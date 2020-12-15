@@ -15,20 +15,21 @@ namespace WebServices.Controllers
         // GET: Web
         public IEnumerable<Reservation> GetAllReservations()
         {
+            //matches routing api/
             return repo.GetAll();
         }
 
-        public Reservation GetReservations( int id)
+        public Reservation GetReservation( int id)
         {
             return repo.Get(id);
         }
 
-        public Reservation PostReservations(Reservation item)
+        public Reservation PostReservation(Reservation item)
         {
             return repo.Add(item);
         }
 
-        public void  DeleteReservations(int id)
+        public void  DeleteReservation(int id)
         {
             repo.Remove(id);
         }
