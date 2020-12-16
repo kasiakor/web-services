@@ -1,5 +1,5 @@
 ﻿@using WebServices.Models
-@model IEnumerable<Reservation>
+
 @{
     ViewBag.Title = "Reservations";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -7,15 +7,83 @@
 
 <h2>Index</h2>
 @section Scripts {
+    <script>
+        var model =
+        {
+            reservations: ko.observableArray()
+         };
 
-}
+    @*function that targets methods on WebController*@
+    function sendAjaxRequest(httpMethod, callback, url)
+    {
+    $.ajax("/api/web" + (url ? "/" : ""),
+    {
+    type: httpMethod,
+    success: callback
+    });
+    }
 
-@section Body {
-    <div id="summary" class="section panel  panel-primary">
-            @Html.Partial("Summary", Model)
-    </div>
-    <div id="editor" class="section panel  panel-primary">
+    function getAllItems ()
+    {
+        //return;
+        sendAjaxRequest("GET", function(data) {
+            model.reservations.removeAll();
+                for (var i = 0; i < data.length; i++) {
+                model.reservations.push(data[i]);
+            }
+        });
+    }
+
+    function removeItem(item)
+    {
+        sendAjaxRequest("DELETE", function() {
+        GetAllItems();
+        }, item.ReservationId);
+    }
+
+    $(document).ready(function () {
+        getAllItems();
+        ko.applyBindings(model);
+    });
+    </script>
+};
+    @section Body {
+        @*<div id="summary" class="section panel  panel-primary">
+                    @Html.Partial("Summary", Model)
+            </div>*@
+
+        @*use ko and jquery to implement summary*@
+
+        <div id="summary" class="section panel  panel-primary">
+            <div class="panel-heading">
+                Reservation Summary
+            </div>
+            <div class="panel-body">
+                <table class="table table-striped table-condensed">
+                    <thead>
+                        <tr>
+                            <td>Id</td>
+                            <td>Name</td>
+                            <td>Location</td>
+                        </tr>
+                    </thead>
+                    @*model is not included in html , we use ajax request to web api controller, json comes back*@
+                    @*data is processed by the browser!!!*@
+                    <tbody data-bind="foreach: model.reservations">
+                            <tr>
+                                <td data-bind="text: ReservationID"></td>
+                                <td data-bind="text: ClientName"></td>
+                                <td data-bind="text: Location"></td>
+                                <td >
+                                    <button class="btn btn-xs btn-primary" data-bind="click: removeItem">Remove</button>
+                                </td>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="editor" class="section panel  panel-primary">
             @Html.Partial("Edit", new Reservation())
-    </div>
-}
+        </div>
+    }
 
