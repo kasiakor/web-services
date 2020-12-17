@@ -16,12 +16,12 @@
     @*function that targets methods on WebController*@
     function sendAjaxRequest(httpMethod, callback, url)
     {
-    $.ajax("/api/web" + (url ? "/" : ""),
-    {
-    type: httpMethod,
-    success: callback
-    });
-    }
+        $.ajax("/api/web" + (url ? "/" + url : ""),
+        {
+                type: httpMethod,
+                success: callback
+        })
+    };
 
     function getAllItems ()
     {
@@ -29,16 +29,18 @@
         sendAjaxRequest("GET", function(data) {
             model.reservations.removeAll();
                 for (var i = 0; i < data.length; i++) {
-                model.reservations.push(data[i]);
+                    model.reservations.push(data[i]);
+                    console.log(data)
+                    console.log(data[i].ReservationID)
             }
         });
     }
 
     function removeItem(item)
     {
-        sendAjaxRequest("DELETE", function() {
-        GetAllItems();
-        }, item.ReservationId);
+        sendAjaxRequest("DELETE", function(item) {
+            getAllItems();
+        }, item.ReservationID);
     }
 
     $(document).ready(function () {
