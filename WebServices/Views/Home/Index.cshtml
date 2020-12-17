@@ -10,18 +10,36 @@
     <script>
         var model =
         {
-            reservations: ko.observableArray()
+            reservations: ko.observableArray(),
+            editor: {
+                name : ko.observable(""),
+                location : ko.observable("")
+            }
          };
 
     @*function that targets methods on WebController*@
-    function sendAjaxRequest(httpMethod, callback, url)
+    function sendAjaxRequest(httpMethod, callback, url, reqData)
     {
-        $.ajax("/api/web" + (url ? "/" + url : ""),
-        {
-                type: httpMethod,
-                success: callback
-        })
+        $.ajax(
+        {    
+            type: httpMethod,
+            success: callback,
+            url: "/api/web" + (url ? "/" + url : ""),
+            data: reqData
+        });
     };
+
+        function handleEditorClick() {
+            sendAjaxRequest("POST", function (newItem) {
+                model.reservations.push(newItem)
+            },
+                null,
+                {
+                    ClientName : model.editor.name,
+                    Location : model.editor.location
+                }             
+            )
+        }
 
     function getAllItems ()
     {
@@ -85,7 +103,23 @@
         </div>
 
         <div id="editor" class="section panel  panel-primary">
-            @Html.Partial("Edit", new Reservation())
+            <div class="panel-heading">
+                Create Reservation
+            </div>
+            <div class="panel-body">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                    </div>
+                        <input class = "form-control" data-bind="value :  model.editor.name"/> 
+              
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input class="form-control" data-bind="value :  model.editor.location" />
+                        </div>
+
+                    <button  class="btn btn-primary"  data-bind="click: handleEditorClick">Save</button>
+    
+            </div>
         </div>
     }
 
